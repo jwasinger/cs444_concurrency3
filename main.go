@@ -6,6 +6,10 @@ import (
   "sync"
 )
 
+func threadPrint(msg string) {
+  fmt.Printf("%d: %s\n", getGID(), msg)
+}
+
 func main() {
   l := &LinkedList{}
 
@@ -29,7 +33,7 @@ func main() {
 
         insert_wg.Add(1)
 
-        fmt.Println("inserting...")
+        threadPrint("inserting...")
         time.Sleep(1*time.Second)
 
         im.Lock()
@@ -47,12 +51,15 @@ func main() {
   for i := 0; i < numDeleters; i++ {
     go func() {
       for ; ; {
+        threadPrint("deleting blocked")
+
         insert_wg.Wait()
         search_wg.Wait()
         
         delete_wg.Add(1)
 
-        fmt.Println("deleting....")
+        //fmt.Println("deleting....")
+        threadPrint("deleting")
         time.Sleep(time.Second*1)
 
         dm.Lock()
@@ -72,7 +79,8 @@ func main() {
         delete_wg.Wait()
         search_wg.Add(1)
 
-        fmt.Println("searching... ")
+        threadPrint("searching")
+
         time.Sleep(time.Second*1)
 
         search_wg.Done()

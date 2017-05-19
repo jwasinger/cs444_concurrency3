@@ -4,10 +4,13 @@ import (
   "fmt"
   "time"
   "sync"
+  "math/rand"
 )
 
 func threadPrint(msg string) {
-  fmt.Printf("%d: %s\n", getGID(), msg)
+  t := time.Now()
+  t.Format("20060102150405")
+  fmt.Printf("%s, %d: %s\n", t.Format("20060102150405"), getGID(), msg)
 }
 
 func main() {
@@ -36,9 +39,11 @@ func main() {
         threadPrint("inserting...")
         time.Sleep(1*time.Second)
 
+        rand_val := rand.Intn(100)
         im.Lock()
-        l.PushEnd(1)
-        fmt.Println(l.Size())
+        l.PushEnd(rand_val)
+        //fmt.Println(l.Size())
+        l.Print()
         im.Unlock()
 
         insert_wg.Done()
@@ -59,7 +64,7 @@ func main() {
         delete_wg.Add(1)
 
         //fmt.Println("deleting....")
-        threadPrint("deleting")
+        threadPrint("deleting...")
         time.Sleep(time.Second*1)
 
         dm.Lock()
@@ -73,15 +78,21 @@ func main() {
     } ()
   }
 
+  //searchers
   for i := 0; i < numSearchers; i++ {
     go func() {
       for ; ; {
+        threadPrint("searching blocked")
         delete_wg.Wait()
         search_wg.Add(1)
 
-        threadPrint("searching")
-
+        threadPrint("searching...")
         time.Sleep(time.Second*1)
+        /*
+        randIndex := rand.Intn(l.Size()-1)
+        found := l.Search(randIndex)
+        fmt.Printf("%d: found %d\n", getGID(), found)
+        */
 
         search_wg.Done()
         time.Sleep(1*time.Second)

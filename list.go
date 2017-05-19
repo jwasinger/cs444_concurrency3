@@ -14,6 +14,12 @@ type LinkedList struct {
   Root *LLNode  
 }
 
+/*
+func (n *LLNode) Next() {
+
+}
+*/
+
 func (l *LinkedList) Print() {
   fmt.Printf("[")
 
